@@ -368,6 +368,12 @@ func TestLintVersionBoundaries(t *testing.T) {
 			introduced: PHP84,
 		},
 		{
+			name:       "promoted property hooks",
+			source:     "<?php class C { function __construct(public string $name { set => $value; }) {} }",
+			before:     PHP83,
+			introduced: PHP84,
+		},
+		{
 			name:       "asymmetric visibility",
 			source:     "<?php class C { public private(set) string $name; }",
 			before:     PHP83,
@@ -472,6 +478,23 @@ func TestModernCompileValidation(t *testing.T) {
 		{
 			name:   "method body beginning with get",
 			source: "<?php class C { function run() { get(); } }",
+		},
+		{
+			name:   "attributed hooked property",
+			source: "<?php class C { #[Field(type: 'string', api: true)] public string $name { set(string $value) { $this->name = $value; } } }",
+		},
+		{
+			name:   "hooked promoted property",
+			source: "<?php class C { function __construct(public readonly int $id, public ?string $name { set { $this->name = $value; } }) {} }",
+		},
+		{
+			name:   "hooked promoted property with default",
+			source: "<?php class C { function __construct(public string $name = '' { get => $this->name; }) {} }",
+		},
+		{
+			name:       "readonly hooked promoted property",
+			source:     "<?php class C { function __construct(public readonly string $name { get => $this->name; }) {} }",
+			wantPhrase: "cannot be readonly",
 		},
 		{
 			name:       "static hooked property",
