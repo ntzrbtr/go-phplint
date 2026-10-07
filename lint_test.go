@@ -497,6 +497,61 @@ func TestModernCompileValidation(t *testing.T) {
 			wantPhrase: "cannot be readonly",
 		},
 		{
+			name:       "hook outside constructor",
+			source:     "<?php function f(string $x { get => 'x'; }) {}",
+			wantPhrase: "only allowed in constructors",
+		},
+		{
+			name:       "hook on ordinary method parameter",
+			source:     "<?php class C { function f(string $x { get => 'x'; }) {} }",
+			wantPhrase: "only allowed in constructors",
+		},
+		{
+			name:       "promoted virtual asymmetric hook",
+			source:     "<?php class C { function __construct(public private(set) string $x { get => 'x'; }) {} }",
+			wantPhrase: "read-only virtual property",
+		},
+		{
+			name:       "promoted backed reference get with set",
+			source:     "<?php class C { function __construct(public string $x { &get => $this->x; set => $value; }) {} }",
+			wantPhrase: "may not return by reference",
+		},
+		{
+			name:       "ordinary property hook break",
+			source:     "<?php class C { public string $x { get { break; } } }",
+			wantPhrase: "not in a loop",
+		},
+		{
+			name:       "promoted hook variadic parameter",
+			source:     "<?php class C { function __construct(string ...$x { get => $this->x; }) {} }",
+			wantPhrase: "cannot be variadic",
+		},
+		{
+			name:       "promoted hook break",
+			source:     "<?php class C { function __construct(public string $x { get { break; } }) {} }",
+			wantPhrase: "not in a loop",
+		},
+		{
+			name:       "promoted hook with implicit visibility",
+			source:     "<?php class C { function __construct(string $x { get => $this->x; }) {} }",
+			wantPhrase: "",
+		},
+		{
+			name:       "promoted virtual hook parameter default",
+			source:     "<?php class C { function __construct(public string $x = '' { get => 'x'; }) {} }",
+			wantPhrase: "",
+		},
+		{
+			name:       "promoted hook return independent of constructor",
+			source:     "<?php class C { function __construct(public string $x { get { return $this->x; } }) {} }",
+			wantPhrase: "",
+		},
+		{
+			name:       "promoted hook loop",
+			source:     "<?php class C { function __construct(public string $x { get { while (true) { break; } return $this->x; } }) {} }",
+			wantPhrase: "",
+		},
+		{
 			name:       "static hooked property",
 			source:     "<?php class C { public static string $name { get => $this->name; } }",
 			wantPhrase: "cannot be static",

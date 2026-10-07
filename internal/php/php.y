@@ -1332,10 +1332,10 @@ parameter:
             { $$ = yylex.(*Parser).builder.NewParameter($1, $2, $3, $4, $5, $6, $7, $8, true) }
     |   optional_attributes optional_property_modifiers optional_type_without_static
         optional_arg_ref optional_ellipsis plain_variable T_PROPERTY_HOOKS property_hook_list '}'
-            { $$ = yylex.(*Parser).builder.NewParameter($1, $2, $3, $4, $5, $6, nil, nil, false) }
+            { $$ = yylex.(*Parser).builder.WithParameterHooks(yylex.(*Parser).builder.NewParameter($1, $2, $3, $4, $5, $6, nil, nil, false), $8, $9) }
     |   optional_attributes optional_property_modifiers optional_type_without_static
         optional_arg_ref optional_ellipsis plain_variable '=' expr T_PROPERTY_HOOKS property_hook_list '}'
-            { $$ = yylex.(*Parser).builder.NewParameter($1, $2, $3, $4, $5, $6, $7, $8, true) }
+            { $$ = yylex.(*Parser).builder.WithParameterHooks(yylex.(*Parser).builder.NewParameter($1, $2, $3, $4, $5, $6, $7, $8, true), $10, $11) }
 ;
 
 type_expr:
